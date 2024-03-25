@@ -2,7 +2,7 @@ from database.models import Task
 from database import get_db
 import asyncio
 # Добавление задания
-def add_task(host_id, title, description, status, due_date, category):
+async def add_new_task(host_id, title, description, status, due_date, category):
     db = next(get_db())
     new_task = Task(host_id=host_id, title=title, description=description, status=status, due_date=due_date,
                     category=category)
@@ -15,13 +15,17 @@ def get_tasks():
     tasks = db.query(Task).all()
     return tasks
 # Получить определенное задание
-def get_exact_task(category):
+async def get_exact_task(category):
     db = next(get_db())
-    checker = db.query(Task).filter_by(category=category).all()
-    if checker:
-        return f'{checker.title_name}'
+    tasks = db.query(Task).filter_by(category=category).all()
+
+    if tasks:
+        task_titles = [task.title for task in tasks]
+        return ', '.join(task_titles)
     else:
         return 'Ничего не найдено'
+
+
 #  Удаления задания
 def delete_task(title_id):
     db = next(get_db())

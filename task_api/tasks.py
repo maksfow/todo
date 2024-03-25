@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from database.taskservice import get_tasks, add_task,get_exact_users,get_exact_task,edit_task,delete_task
+from database.taskservice import get_tasks, add_new_task,get_exact_users,get_exact_task,edit_task,delete_task
 task_router = APIRouter(prefix='/task', tags=['Работа с заданиями'])
 # Получить все задания
 @task_router.get('/all-tasks')
@@ -8,9 +8,10 @@ async def all_tasks():
     return get_tasks()
 # Для добавления задания
 @task_router.post('/add-task')
-async def add_task( host_id:int, title:str, description:str, status:str,due_date:int,category:str):
-  new_t = await add_task( host_id,title, description, status,due_date,category)
-  return f'Успешно добавлен {new_t}'
+async def add_task(host_id: int, title: str, description: str, status: str, due_date: int, category: str):
+    new_task_id = await add_new_task(host_id, title, description, status, due_date, category)
+    return f'Успешно добавлен {new_task_id}'
+
 # Получить пользователей кто выполнил определенное задание
 @task_router.get('/task-users')
 async def get_user_tasks(title: str):
@@ -27,7 +28,7 @@ async def edit_post(title_id:int,edit_info:str, new_info:str):
 # Получить определенное задание
 @task_router.get('/get-task')
 async def get_task(category: str):
-    result = get_exact_task(category)
+    result = await get_exact_task(category)
     if result:
         return {'message': result}
     else:
